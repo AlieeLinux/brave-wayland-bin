@@ -9,7 +9,7 @@
 # Contributor: now-im <now im 627 @ gmail . com>
 # Contributor: Giusy Digital <kurmikon at libero dot it>
 
-pkgname=brave-bin
+pkgname=brave-wayland-bin
 pkgver=1.79.123
 pkgrel=1
 epoch=1
@@ -24,23 +24,26 @@ depends=(alsa-lib
 	ttf-font)
 optdepends=('cups: Printer support'
 	'libgnome-keyring: Enable GNOME keyring support'
-	'libnotify: Native notification support')
+	'libnotify: Native notification support'
+	'kwallet: cookies support'
+)
 provides=("${pkgname%-bin}=$pkgver" 'brave-browser')
 conflicts=("${pkgname%-bin}")
 options=(!strip)
-source=($pkgname.sh brave-browser.desktop)
+replaces=("brave-bin" "brave")
+source=($pkgname.sh brave-browser-wayland.desktop)
 source_x86_64=(${pkgname}-${pkgver}-x86_64.zip::https://github.com/brave/brave-browser/releases/download/v${pkgver}/brave-browser-${pkgver}-linux-amd64.zip)
 source_aarch64=(${pkgname}-${pkgver}-aarch64.zip::https://github.com/brave/brave-browser/releases/download/v${pkgver}/brave-browser-${pkgver}-linux-arm64.zip)
 
 noextract=(${pkgname}-${pkgver}-x86_64.zip ${pkgname}-${pkgver}-aarch64.zip)
-sha256sums=('75a87dd17b42fcc6f27adfd16c82bed1c08e9251b07d2012f8d49f7412fa1d00'
-            'c07276b69c7304981525ecb022f92daf7ae125a4fb05ac3442157b50826e257a')
+sha256sums=('e41274d9c1c64fa199e94800d03e8c27f5b2a7829a7504da8c356567d96d2c1d'
+            'b925cc2ac25cb038b596134d7001f7ebb1ce0c11c82a9e036f3534711d5ab323')
 sha256sums_x86_64=('59e4a73387426b7d8b86332577a33ecd277fc7874581bab22e5afd7addebe279')
 sha256sums_aarch64=('0a343fc117cb94128a4ce57db05103bd6d7750e3153d5e29c399173b41856067')
 
 prepare() {
 	mkdir -p brave
-	bsdtar -xf "$pkgname-$pkgver-$CARCH.zip" -C brave
+	bsdtar -xvf "$pkgname-$pkgver-$CARCH.zip" -C brave
 	chmod +x brave/brave
 }
 
@@ -49,10 +52,10 @@ package() {
 	cp -a brave "$pkgdir/opt/$pkgname"
 
 	# allow firejail users to get the suid sandbox working
-	chmod 4755 "$pkgdir/opt/brave-bin/chrome-sandbox"
+	chmod 4755 "$pkgdir/opt/brave-wayland-bin/chrome-sandbox"
 
 	install -Dm0755 "$pkgname.sh" "$pkgdir/usr/bin/brave"
-	install -Dm0644 -t "$pkgdir/usr/share/applications/" "brave-browser.desktop"
+	install -Dm0644 -t "$pkgdir/usr/share/applications/" "brave-browser-wayland.desktop"
 	install -Dm0644 -t "$pkgdir/usr/share/licenses/$pkgname/" brave/LICENSE
 	pushd "$pkgdir/usr/"
 	for size in 16x16 24x24 32x32 48x48 64x64 128x128 256x256; do
